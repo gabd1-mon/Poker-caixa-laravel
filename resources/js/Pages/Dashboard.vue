@@ -1,6 +1,13 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+// Pega todas as propriedades da página, incluindo as compartilhadas
+const page = usePage();
+
+// Cria uma variável reativa que aponta diretamente para o objeto do usuário
+const user = computed(() => page.props.auth.user);
 </script>
 
 <template>
@@ -12,6 +19,7 @@ import { Head } from '@inertiajs/vue3';
                 class="text-xl font-semibold leading-tight text-gray-800"
             >
                 Dashboard
+
             </h2>
         </template>
 
@@ -21,7 +29,8 @@ import { Head } from '@inertiajs/vue3';
                     class="overflow-hidden bg-white shadow-sm sm:rounded-lg"
                 >
                     <div class="p-6 text-gray-900">
-                        You're logged in!
+                        Olá, {{ user.name }}
+
                     </div>
                 </div>
             </div>
