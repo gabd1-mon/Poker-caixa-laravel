@@ -1,36 +1,97 @@
 <?php
+
 namespace App\Http\Controllers;
+
 use App\Models\Jogador;
+use App\Models\Transacao;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+
 class JogadorController extends Controller
 {
+    /**
+     * Exibe uma lista de todos os jogadores.
+     */
+    public function index()
+    {
+        $jogadores = Jogador::latest()->get();
+
+        return Inertia::render('Jogadores/Index', [
+            'jogadores' => $jogadores,
+        ]);
+    }
+
+    /**
+     * Mostra o formulário para criar um novo jogador.
+     */
     public function create()
     {
-
         return Inertia::render('Jogadores/Create');
     }
 
-    public function store(Request $request){
+    /**
+     * Salva um novo jogador no banco de dados.
+     */
+    public function store(Request $request)
+    {
         $validatedData = $request->validate([
             'nome' => 'required|string|max:255',
-            'contato' => 'required|string|max:255',
+            'contato' => 'nullable|string|max:255',
         ]);
+
         Jogador::create($validatedData);
+
         return redirect()->route('jogadores.index');
-
     }
 
-    public function index(){
-        $jogadores = \App\Models\Jogador::latest()->get();
-
-        return Inertia::render('Jogadores/Index',
-            ['jogadores' => $jogadores]);
-
+    /**
+     * Mostra o formulário para editar um jogador existente.
+     */
+    public function edit(Jogador $jogador)
+    {
+        return Inertia::render('Jogadores/Edit', [
+            'jogador' => $jogador,
+        ]);
     }
 
+    /**
+     * Atualiza o jogador especificado no banco de dados.
+     */
+    public function update(Request $request, Jogador $jogador)
+    {
+        $validatedData = $request->validate([
+            'nome' => 'required|string|max:255',
+            'contato' => 'nullable|string|max:255',
+        ]);
 
+        $jogador->update($validatedData);
 
+        return redirect()->route('jogadores.index');
+    }
 
+    /**
+     * Remove o jogador especificado do banco de dados.
+     */
+    public function destroy(Jogador $jogador)
+    {
+        $jogador->delete();
 
+        return redirect()->route('jogadores.index');
+    }
+
+    /**
+     * Mostra o extrato de transações de um jogador.
+     */
+    public function extrato(Jogador $jogador)
+    {
+        $transacoes = Transacao::where('jogador_id', $jogador->id)
+            ->whereDate('created_at', today())
+            ->latest()
+            ->get();
+
+        return Inertia::render('Jogadores/Extrato', [
+            'jogador' => $jogador,
+            'transacoes' => $transacoes,
+        ]);
+    }
 }

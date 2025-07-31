@@ -1,0 +1,54 @@
+<script setup>
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { Head } from '@inertiajs/vue3';
+import { computed } from 'vue';
+
+// Recebe os totais que o Controller nos enviou como props
+const props = defineProps({
+    totalEntradas: String,
+    totalSaidas: String,
+    balancoFinal: String,
+});
+
+// Lógica para definir a cor do balanço (verde se positivo, vermelho se negativo)
+const balancoColorClass = computed(() => {
+    // Removemos a formatação para verificar se o número é negativo
+    const balancoNumerico = parseFloat(props.balancoFinal.replace(/\./g, '').replace(',', '.'));
+    return balancoNumerico >= 0 ? 'text-green-600' : 'text-red-600';
+});
+</script>
+
+<template>
+    <Head title="Relatório de Caixa" />
+
+    <AuthenticatedLayout>
+        <template #header>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Relatório de Fechamento do Dia</h2>
+        </template>
+
+        <div class="py-12">
+            <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6 text-gray-900 space-y-4">
+
+                        <div class="flex justify-between items-center border-b pb-2">
+                            <span class="text-lg font-medium text-gray-600">Total de Entradas (Buy-ins):</span>
+                            <span class="text-lg font-bold text-blue-600">R$ {{ totalEntradas }}</span>
+                        </div>
+
+                        <div class="flex justify-between items-center border-b pb-2">
+                            <span class="text-lg font-medium text-gray-600">Total de Saídas (Cash-outs):</span>
+                            <span class="text-lg font-bold text-orange-600">R$ {{ totalSaidas }}</span>
+                        </div>
+
+                        <div class="flex justify-between items-center pt-4">
+                            <span class="text-xl font-bold text-gray-800">Balanço Final (Casa):</span>
+                            <span class="text-xl font-bold" :class="balancoColorClass">R$ {{ balancoFinal }}</span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </AuthenticatedLayout>
+</template>
