@@ -53,7 +53,7 @@ Este projeto foi configurado para rodar com **Laravel Sail** em um ambiente **WS
 
 1.  **Clone o repositório para dentro do seu ambiente WSL2:**
     ```bash
-    git clone [https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git](https://github.com/gabd1-mon/Poker-caixa-laravel)
+    git clone(https://github.com/gabd1-mon/Poker-caixa-laravel)
     cd SEU_REPOSITORIO
     ```
 
