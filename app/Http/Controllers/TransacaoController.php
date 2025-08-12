@@ -1,11 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Models\Jogador;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Transacao;
+use Carbon\Carbon;
 
 class TransacaoController extends Controller
 {
@@ -38,26 +38,33 @@ class TransacaoController extends Controller
     }
 
 
-    public function relatorio()
+    public function relatorio(Request $request)
     {
-        // 1. Calcula a soma de todas as transações de 'entrada' de hoje.
+        // Valida se o que foi enviado é de fato uma data.
+        $validated = $request->validate([
+            'data' => 'nullable|date_format:Y-m-d'
+        ]);
+
+        // Usa o Carbon para criar um objeto de data. Se não houver data, usa hoje.
+        $dataConsultada = isset($validated['data']) ? Carbon::parse($validated['data']) : Carbon::today();
+
+        // Calcula a soma das 'entradas' para a data especificada.
         $totalEntradas = \App\Models\Transacao::where('tipo', 'entrada')
-            ->whereDate('created_at', today())
+            ->whereDate('created_at', $dataConsultada)
             ->sum('valor');
 
-        // 2. Calcula a soma de todas as transações de 'saida' de hoje.
+        // Calcula a soma das 'saidas' para a data especificada.
         $totalSaidas = \App\Models\Transacao::where('tipo', 'saida')
-            ->whereDate('created_at', today())
+            ->whereDate('created_at', $dataConsultada)
             ->sum('valor');
 
-        // 3. Calcula o balanço.
         $balancoFinal = $totalEntradas - $totalSaidas;
 
-        // 4. Renderiza o componente Vue e passa os totais como props.
         return Inertia::render('Relatorios/Index', [
             'totalEntradas' => number_format($totalEntradas, 2, ',', '.'),
             'totalSaidas' => number_format($totalSaidas, 2, ',', '.'),
             'balancoFinal' => number_format($balancoFinal, 2, ',', '.'),
+            'dataConsulta' => $dataConsultada->format('Y-m-d'), // Envia a data formatada de volta
         ]);
     }
 
