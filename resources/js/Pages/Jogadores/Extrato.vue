@@ -23,7 +23,7 @@ const saldoFinal = computed(() => {
         .filter(t => t.tipo === 'saida')
         .reduce((sum, t) => sum + parseFloat(t.valor), 0);
 
-    return totalEntradas - totalSaidas;
+    return totalSaidas - totalEntradas;
 });
 
 // Define a cor do saldo (verde se positivo, vermelho se negativo)
