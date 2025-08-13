@@ -6,6 +6,7 @@ use App\Models\Jogador;
 use App\Models\Transacao;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Carbon\Carbon;
 
 class JogadorController extends Controller
 {
@@ -82,16 +83,27 @@ class JogadorController extends Controller
     /**
      * Mostra o extrato de transações de um jogador.
      */
-    public function extrato(Jogador $jogador)
+    public function extrato(Request $request, Jogador $jogador)
     {
+        $validated = $request->validate([
+            'data' => 'nullable|date_format:Y-m-d'
+        ]);
+
+        $dataConsultada = isset($validated['data']) ? Carbon::parse($validated['data']) : Carbon::today();
+
+
         $transacoes = Transacao::where('jogador_id', $jogador->id)
-            ->whereDate('created_at', today())
+            ->whereBetween('created_at', [
+                $dataConsultada->copy()->startOfDay(),
+                $dataConsultada->copy()->endOfDay()
+            ])
             ->latest()
             ->get();
 
         return Inertia::render('Jogadores/Extrato', [
             'jogador' => $jogador,
             'transacoes' => $transacoes,
+            'dataConsulta' => $dataConsultada->format('Y-m-d'),
         ]);
     }
 }

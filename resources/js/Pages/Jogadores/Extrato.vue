@@ -1,13 +1,17 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, router } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
-// Recebe os dados do jogador e as suas transações, enviados pelo Controller
+// Recebe os dados do jogador, transações e a data consultada
 const props = defineProps({
     jogador: Object,
     transacoes: Array,
+    dataConsulta: String,
 });
+
+// Estado reativo para o campo de data, inicializado com a data que veio do backend
+const dataSelecionada = ref(props.dataConsulta);
 
 // Calcula o saldo final do jogador para o dia
 const saldoFinal = computed(() => {
@@ -47,6 +51,16 @@ const cancelarTransacao = (transacaoId) => {
         });
     }
 };
+
+// Função para buscar o extrato da nova data selecionada
+const buscarExtrato = () => {
+    router.get(route('jogadores.extrato', { jogador: props.jogador.id }), {
+        data: dataSelecionada.value
+    }, {
+        preserveState: true,
+        preserveScroll: true,
+    });
+};
 </script>
 
 <template>
@@ -55,7 +69,7 @@ const cancelarTransacao = (transacaoId) => {
     <AuthenticatedLayout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Extrato do Dia: {{ jogador.nome }}
+                Extrato de: {{ jogador.nome }}
             </h2>
         </template>
 
@@ -63,6 +77,19 @@ const cancelarTransacao = (transacaoId) => {
             <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">
+
+                        <!-- Formulário de Filtro de Data -->
+                        <div class="mb-6">
+                            <label for="data" class="block text-sm font-medium text-gray-700">Consultar extrato do dia:</label>
+                            <input
+                                type="date"
+                                id="data"
+                                v-model="dataSelecionada"
+                                @change="buscarExtrato"
+                                class="mt-1 block w-full md:w-1/2 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            />
+                        </div>
+
                         <!-- Tabela para telas médias e grandes -->
                         <table class="min-w-full divide-y divide-gray-200 hidden md:table">
                             <thead class="bg-gray-50">
@@ -111,7 +138,7 @@ const cancelarTransacao = (transacaoId) => {
 
                         <!-- Mensagem para caso não haja transações -->
                         <div v-if="transacoes.length === 0" class="text-center text-gray-500 py-8">
-                            Nenhuma transação registrada para este jogador hoje.
+                            Nenhuma transação registrada para este jogador na data selecionada.
                         </div>
 
                         <!-- Saldo Final -->
