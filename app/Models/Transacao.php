@@ -10,11 +10,13 @@ class Transacao extends Model
 {
     use HasFactory, SoftDeletes;
 
-    // Boa prática adicionar o nome da tabela
     protected $table = 'transacoes';
 
-
-
+    /**
+     * Os atributos que podem ser atribuídos em massa.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'jogador_id',
         'user_id',
@@ -22,4 +24,12 @@ class Transacao extends Model
         'valor',
         'deleted_by',
     ];
+
+    /**
+     * Define a relação de que uma Transação pertence a um Jogador.
+     */
+    public function jogador()
+    {
+        return $this->belongsTo(Jogador::class);
+    }
 }
