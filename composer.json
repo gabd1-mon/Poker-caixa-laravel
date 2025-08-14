@@ -51,6 +51,7 @@
             "@php artisan key:generate --ansi"
         ],
         "post-install-cmd": [
+            "@php artisan ziggy:generate",
             "npm install && npm run build"
         ]
     },
