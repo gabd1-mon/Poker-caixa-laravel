@@ -4,14 +4,8 @@ import './bootstrap';
 import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createApp, h } from 'vue';
-import { Ziggy } from './ziggy'; // Objeto gerado pelo artisan
+import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 
-// Crie uma função para registrar Ziggy no Vue
-const ZiggyVue = {
-    install(app) {
-        app.config.globalProperties.$ziggy = Ziggy;
-    },
-};
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
